@@ -12,6 +12,9 @@ import { ScanOutput } from "./ScanOutput";
 import { DecryptOutput } from "./DecryptOutput";
 import { HtopOutput } from "./HtopOutput";
 import { WgetOutput } from "./WgetOutput";
+import { WeatherOutput } from "./WeatherOutput";
+import { CalOutput } from "./CalOutput";
+import { StatsOutput } from "./StatsOutput";
 import { useIsMobile } from "../hooks/use-mobile";
 
 // Importación de los archivos de idioma.
@@ -829,6 +832,27 @@ export function Terminal() {
 
     return <WgetOutput t={t} targetUrl={url} filename={filename} onComplete={() => addFileToCurrentDir(filename)} />;
   };
+
+  commands['weather'] = (args, t) => {
+    const city = args.join(' ');
+    if (!city) {
+      return t('weather_usage');
+    }
+    return <WeatherOutput city={city} t={t} apiKey={process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || ''} />;
+  };
+
+  commands['cal'] = (args, t) => {
+    return <CalOutput t={t} />;
+  };
+
+  commands['stats'] = (args, t) => {
+    return <StatsOutput t={t} />;
+  };
+
+  commands['pwd'] = (args, t, { getPath }) => {
+    return getPath();
+  };
+
 
   // --- MANEJADORES DE EVENTOS ---
 
