@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root, .theme-default {
+    --background: 257 7% 3%;
+    --foreground: 210 20% 98%;
+    --card: 257 7% 3%;
+    --card-foreground: 210 20% 98%;
+    --popover: 257 7% 3%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 38 96% 52%;
+    --primary-foreground: 257 7% 8%;
+    --secondary: 285 13% 16%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 285 13% 16%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 23 20% 25%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 285 13% 16%;
+    --input: 285 13% 16%;
+    --ring: 38 96% 52%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 257 7% 3%;
+    --foreground: 210 20% 98%;
+    --card: 257 7% 3%;
+    --card-foreground: 210 20% 98%;
+    --popover: 257 7% 3%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 38 96% 52%;
+    --primary-foreground: 257 7% 8%;
+    --secondary: 285 13% 16%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 285 13% 16%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 23 20% 25%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 285 13% 16%;
+    --input: 285 13% 16%;
+    --ring: 38 96% 52%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+  .theme-cyberpunk {
+    --background: 225 30% 6%;
+    --foreground: 180 100% 85%;
+    --primary: 50 100% 50%;
+    --primary-foreground: 225 30% 6%;
+    --accent: 330 100% 55%;
+  }
+  .theme-witcher {
+    --background: 25 15% 10%;
+    --foreground: 30 20% 85%;
+    --primary: 0 60% 50%;
+    --primary-foreground: 25 15% 10%;
+    --accent: 40 30% 40%;
+  }
+  .theme-hollow {
+    --background: 210 25% 8%;
+    --foreground: 210 30% 90%;
+    --primary: 200 100% 95%;
+    --primary-foreground: 210 25% 8%;
+    --accent: 220 40% 30%;
+  }
+  .theme-reddead {
+    --background: 15 20% 9%;
+    --foreground: 25 25% 80%;
+    --primary: 0 70% 45%;
+    --primary-foreground: 15 20% 9%;
+    --accent: 20 15% 35%;
+  }
+}
+
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-accent rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+}
