@@ -10,6 +10,9 @@ import { Toaster } from '../components/ui/toaster';
 export const metadata: Metadata = {
   title: 'VoidShell',
   description: 'Terminal portfolio for Israel Zamora - GlitchBane.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 // RootLayout es el componente principal que envuelve a toda la aplicación.
