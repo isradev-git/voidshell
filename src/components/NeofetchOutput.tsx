@@ -49,11 +49,12 @@ export function NeofetchOutput({ data }: NeofetchOutputProps) {
 
   return (
     // Usa flexbox para mostrar el arte ASCII y la información lado a lado.
-    <div className="flex flex-col sm:flex-row gap-4">
+    // 'sm:items-center' alinea ambos elementos verticalmente al centro en pantallas de escritorio.
+    <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
       {/* El arte ASCII se muestra dentro de una etiqueta <pre> para mantener el formato. */}
       <pre className="text-primary text-xs sm:text-sm leading-tight sm:leading-tight">{asciiArt}</pre>      
       {/* Contenedor para la información del sistema. */}
-      <div className="flex flex-col gap-1 text-sm">
+      <div className="flex flex-col justify-center gap-1 text-sm">
         <InfoLine label={usuario.split('@')[0]} value={usuario} />
         {host && <InfoLine label="Host" value={host} />}
         {ip && <InfoLine label="IP" value={ip} />}
