@@ -127,6 +127,7 @@ const fileSystem: FileSystemNode = {
             'contact.md': { type: 'file', content: 'contact_md' },
             'social.md': { type: 'file', content: 'social_md' },
             'resume.md': { type: 'file', content: 'resume_md' },
+            'credits.md': { type: 'file', content: 'credits_md' },
           }
         }
       }
@@ -419,6 +420,62 @@ export function Terminal() {
   };
   
   // --- LÓGICA DE COMANDOS ---
+  
+  // Datos para los comandos 'man' y 'blog'
+  const getManPages = useCallback((t: (key: keyof Translations, params?: any) => string) => ({
+    "help": { "name": "help - Display information about builtin commands.", "synopsis": "help", "description": t('man_help_description') },
+    "ls": { "name": "ls - List directory contents.", "synopsis": "ls [DIRECTORY]", "description": t('man_ls_description') },
+    "cat": { "name": "cat - Concatenate and display files.", "synopsis": "cat [FILE]", "description": t('man_cat_description') },
+    "cd": { "name": "cd - Change the current directory.", "synopsis": "cd [DIRECTORY]", "description": t('man_cd_description') },
+    "tree": { "name": "tree - Display directory contents as a tree.", "synopsis": "tree [DIRECTORY]", "description": t('man_tree_description') },
+    "scan": { "name": "scan - Simulate a network port scan.", "synopsis": "scan <TARGET>", "description": t('man_scan_description') },
+    "decrypt": { "name": "decrypt - Decrypt an encrypted file.", "synopsis": "decrypt <FILE>", "description": t('man_decrypt_description') },
+    "connect": { "name": "connect - Connect to a remote host.", "synopsis": "connect <HOST>", "description": t('man_connect_description') },
+    "htop": { "name": "htop - Interactive process viewer.", "synopsis": "htop", "description": t('man_htop_description') },
+    "top": { "name": "top - Display system processes.", "synopsis": "top", "description": t('man_top_description') },
+    "neofetch": { "name": "neofetch - Display system information.", "synopsis": "neofetch", "description": t('man_neofetch_description') },
+    "cowsay": { "name": "cowsay - A talking cow.", "synopsis": "cowsay [MESSAGE]", "description": t('man_cowsay_description') },
+    "history": { "name": "history - Display command history.", "synopsis": "history", "description": t('man_history_description') },
+    "switch": { "name": "switch - Change the visual theme of the terminal.", "synopsis": "switch <THEME_NAME | THEME_NUMBER>", "description": t('man_switch_description') },
+    "lang": { "name": "lang - Change the terminal language.", "synopsis": "lang <LANGUAGE_CODE>", "description": t('man_lang_description') },
+    "clear": { "name": "clear - Clear the terminal screen.", "synopsis": "clear", "description": t('man_clear_description') },
+    "date": { "name": "date - Display the current date and time.", "synopsis": "date", "description": t('man_date_description') },
+    "whoami": { "name": "whoami - Display the effective user ID.", "synopsis": "whoami", "description": t('man_whoami_description') },
+    "about": { "name": "about - Display information about the portfolio owner.", "synopsis": "about", "description": t('man_about_description') },
+    "resume": { "name": "resume - Display work experience and education.", "synopsis": "resume", "description": t('man_resume_description') },
+    "skills": { "name": "skills - Display technical skills.", "synopsis": "skills", "description": t('man_skills_description') },
+    "experience": { "name": "experience - Display work experience.", "synopsis": "experience", "description": t('man_experience_description') },
+    "education": { "name": "education - Display educational background.", "synopsis": "education", "description": t('man_education_description') },
+    "project-list": { "name": "project-list - Display links to projects.", "synopsis": "project-list", "description": t('man_project-list_description') },
+    "project": { "name": "project - Display information about a specific project.", "synopsis": "project <PROJECT_NAME>", "description": t('man_project_description') },
+    "contact": { "name": "contact - Display contact information.", "synopsis": "contact", "description": t('man_contact_description') },
+    "social": { "name": "social - Display social media links.", "synopsis": "social", "description": t('man_social_description') },
+    "echo": { "name": "echo - Display a line of text.", "synopsis": "echo [TEXT]", "description": t('man_echo_description') },
+    "motd": { "name": "motd - Display a random message of the day.", "synopsis": "motd", "description": t('man_motd_description') },
+    "blog": { "name": "blog - Read blog posts.", "synopsis": "blog <ls | read POST_SLUG>", "description": t('man_blog_description') },
+    "man": { "name": "man - Format and display the on-line manual pages.", "synopsis": "man <COMMAND>", "description": t('man_man_description') },
+    "sudo": { "name": "sudo - Execute a command as another user.", "synopsis": "sudo <command>", "description": t('man_sudo_description') },
+    "wget": { "name": "wget - Download files from the network.", "synopsis": "wget <URL>", "description": t('man_wget_description') },
+    "weather": { "name": "weather - Displays the weather forecast.", "synopsis": "weather <city>", "description": t('man_weather_description') },
+    "cal": { "name": "cal - Displays a calendar.", "synopsis": "cal", "description": t('man_cal_description') },
+    "stats": { "name": "stats - Display developer stats.", "synopsis": "stats", "description": t('man_stats_description') },
+    "pwd": { "name": "pwd - Print name of current/working directory.", "synopsis": "pwd", "description": t('man_pwd_description') },
+    "credits": { "name": "credits - Display project credits.", "synopsis": "credits", "description": t('man_credits_description') }
+  }), [lang]);
+  
+  const getBlogPosts = useCallback((t: (key: keyof Translations, params?: any) => string) => ({
+      "desarrollas-en-windows": {
+          "title": t('blog_post_1_title'),
+          "date": "2024-08-12",
+          "content": t('blog_post_1_content')
+      },
+      "ensenar-desarrollo": {
+          "title": t('blog_post_2_title'),
+          "date": "2024-08-19",
+          "content": t('blog_post_2_content')
+      }
+  }), [lang]);
+
 
   // Función principal para procesar y ejecutar un comando.
   const processCommand = useCallback(async (commandStr: string) => {
@@ -541,6 +598,7 @@ export function Terminal() {
   commands['experience'] = (args, t) => t_html('experience_md');
   commands['education'] = (args, t) => t_html('education_md');
   commands['project-list'] = (args, t) => t_html('project-list_md');
+  commands['credits'] = (args, t) => t_html('credits_md');
   commands['project'] = (args, t) => {
     const projectName = args[0]?.toLowerCase();
     if (!projectName) {
@@ -620,7 +678,7 @@ export function Terminal() {
   };
   commands['blog'] = (args, t) => {
     const subCommand = args[0];
-    const blogPostsData = JSON.parse(t('blog_posts_json'));
+    const blogPostsData = getBlogPosts(t);
 
     if (!subCommand) {
       return t_html('blog_usage');
@@ -646,7 +704,7 @@ export function Terminal() {
       if (!postSlug) {
         return t('blog_read_usage');
       }
-      const post = blogPostsData[postSlug];
+      const post = blogPostsData[postSlug as keyof typeof blogPostsData];
       if (post) {
         return (
           <div className="space-y-2">
@@ -784,8 +842,8 @@ export function Terminal() {
     if (!commandName) {
         return t('man_usage');
     }
-    const manPagesData = JSON.parse(t('man_pages_json'));
-    const page = manPagesData[commandName];
+    const manPagesData = getManPages(t);
+    const page = manPagesData[commandName as keyof typeof manPagesData];
 
     if (page) {
         return (
