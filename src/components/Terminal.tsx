@@ -34,28 +34,43 @@ interface TerminalLine {
 
 // Datos de los proyectos, utilizados por el comando `project`.
 const projectData: Record<string, { name: string; description: string; githubUrl: string; demoUrl: string; tech: string[] }> = {
-  "quimera": {
-    name: "Proyecto Quimera",
-    description: "Motor de análisis predictivo impulsado por IA para la detección de anomalías en redes. [CLASIFICADO]",
-    githubUrl: "https://github.com/isradev-git/quimera",
+  "task_manager_terminal": {
+    name: "Gestor de tareas en terminal",
+    description: "Un gestor de tareas en terminal. Hecho con Python y Rich.",
+    githubUrl: "https://github.com/isradev-git/task_manager_terminal",
     demoUrl: "#",
-    tech: ["Python", "TensorFlow", "FastAPI", "Next.js"]
+    tech: ["Python", "Rich"]
   },
-  "anochecer": {
-    name: "Operación Anochecer",
-    description: "Protocolo de comunicación descentralizado e irrastreable basado en una red P2P. [TOP SECRET]",
-    githubUrl: "https://github.com/isradev-git/anochecer",
+  "gestor-contrase-as": {
+    name: "Gestor de contraseñas",
+    description: "Hecho en python con interfaz hecha a mano.",
+    githubUrl: "https://github.com/isradev-git/gestor-contrase-as",
     demoUrl: "#",
-    tech: ["Go", "Libp2p", "React"]
+    tech: ["Python"]
   },
-  "daemons": {
-    name: "SystemDaemons",
-    description: "Colección de agentes autónomos para la monitorización y automatización de infraestructuras. [CONFIDENCIAL]",
-    githubUrl: "https://github.com/isradev-git/daemons",
-    demoUrl: "#",
-    tech: ["Rust", "Docker", "gRPC"]
+  "map": {
+    name: "Mapa interactivo en 3D",
+    description: "Usando MapBox API. Hecho con Html, tailwind css y javascript.",
+    githubUrl: "https://github.com/isradev-git/map",
+    demoUrl: "https://glitchbane-map.vercel.app/",
+    tech: ["HTML", "Tailwind CSS", "JavaScript", "MapBox API"]
+  },
+  "tttisra-github-io": {
+    name: "Tres en Raya",
+    description: "Hecho con Html, css y javascript.",
+    githubUrl: "https://github.com/isradev-git/tttisra-github.io",
+    demoUrl: "https://isradev-git.github.io/tttisra-github.io/",
+    tech: ["HTML", "CSS", "JavaScript"]
+  },
+  "checklist-app-svelte": {
+    name: "CheckList con Svelte",
+    description: "CheckList con Svelte.",
+    githubUrl: "https://github.com/isradev-git/checklist-app-svelte",
+    demoUrl: "https://checklist-app-svelte-isradev-git.vercel.app/",
+    tech: ["Svelte"]
   }
 };
+
 
 // Mapeo de nombres de temas a las clases CSS correspondientes.
 const themes: Record<string, string> = {
@@ -103,10 +118,7 @@ const fileSystem: FileSystemNode = {
             'Projects': {
               type: 'dir',
               children: {
-                'README.md': { type: 'file', content: 'project-list_md' },
-                'quimera.proj': { type: 'file', content: 'project quimera' },
-                'anochecer.proj': { type: 'file', content: 'project anochecer' },
-                'daemons.proj': { type: 'file', content: 'project daemons' }
+                'README.md': { type: 'file', content: 'project_readme_md' }
               }
             },
             'Pictures': {
@@ -146,9 +158,6 @@ const remoteSystems: Record<string, { welcome: string, files: string[] }> = {
         files: ["node_list.txt", "p2p_daemon", "comm_protocol.spec"]
     }
 };
-
-// Objeto que almacenará todas las funciones de los comandos.
-const commands: Record<string, (args: string[], t: (key: keyof Translations, params?: any) => string, terminal: Terminal) => React.ReactNode | void> = {};
 
 // Implementación del comando `cowsay`.
 const cowsay = (message: string, t: (key: keyof Translations) => string) => {
@@ -210,6 +219,11 @@ export interface Terminal {
   isMobile: boolean;
   addFileToCurrentDir: (filename: string) => void;
 }
+
+// Objeto que almacenará todas las funciones de los comandos.
+type CommandRunner = (args: string[], t: (key: keyof Translations, params?: any) => string, terminal: Terminal) => React.ReactNode | void;
+const commands: Record<string, CommandRunner> = {};
+
 
 // Componente principal de la Terminal.
 export function Terminal() {
@@ -297,18 +311,6 @@ export function Terminal() {
     });
   }, [currentPath, getNodeFromPath]);
 
-  // Objeto que se pasa a los comandos para que puedan interactuar con la terminal.
-  const terminalInterface: Terminal = {
-    setPath: (path: string) => setCurrentPath(path),
-    getPath: () => currentPath,
-    addLine,
-    t,
-    setRemoteHost,
-    finishInteractiveCommand,
-    isMobile,
-    addFileToCurrentDir,
-  };
-
   // Resuelve una ruta relativa o absoluta a una ruta absoluta completa.
   const resolvePath = useCallback((path: string): string => {
     if (path.startsWith('/')) {
@@ -336,15 +338,6 @@ export function Terminal() {
     }
     return '/' + newPath.join('/');
   }, [currentPath]);
-
-  // Función de traducción que devuelve JSX para renderizar HTML.
-  const t_html = useCallback((key: keyof Translations, params: any = {}): React.ReactNode => {
-    const translation = t(key, params);
-    if (translation === key) {
-        return <div className="text-red-500">{t('cat_no_such_file', { filename: key })}</div>;
-    }
-    return <div dangerouslySetInnerHTML={{ __html: translation }} />
-  }, [t]);
   
   // Datos para el comando `neofetch`.
   const userInfo = useCallback((): Omit<NeofetchData, 'asciiArt' | 'ip'> => ({
@@ -362,24 +355,27 @@ export function Terminal() {
 
   // Arte ASCII para `neofetch`.
   const asciiArt = `
-                  ##
-                 ####
-                ######
-               ########
-              ##########
-             ############
-            ##############
-           ################
-          ##################
-         ####################
-        ######################
-       #########      #########
-      ##########      ##########
-     ###########      ###########
-    ##########          ##########
-   #######                  #######
-  ####                          ####
- ###                              ###
+                   -
+                  .o+
+                 .ooo/
+                .oooo:
+               .oooooo:
+               -+oooooo+:
+             ./:--+oooo+:
+            /++++/+++++++:
+           /++++++++++++++:
+          /+++ooooooooooooo/
+         ./ooosssso++osssssso+
+        .oossssso-    ./ossssss+
+       -osssssso.      :ssssssso.
+      :osssssss/        ossssooo/
+     /ossssssss/        +ssssooo/-
+   '/ossssssss+      -o+osooosso+
+   '+sso+:-'             '.-/+oso
+  '+ss/                       '++o/
+  /so'                       '++s/
+  .                         '    .
+  '                          '
 `;
 
   // --- EFECTOS ---
@@ -421,7 +417,6 @@ export function Terminal() {
   
   // --- LÓGICA DE COMANDOS ---
   
-  // Datos para los comandos 'man' y 'blog'
   const getManPages = useCallback((t: (key: keyof Translations, params?: any) => string) => ({
     "help": { "name": "help - Display information about builtin commands.", "synopsis": "help", "description": t('man_help_description') },
     "ls": { "name": "ls - List directory contents.", "synopsis": "ls [DIRECTORY]", "description": t('man_ls_description') },
@@ -446,8 +441,7 @@ export function Terminal() {
     "skills": { "name": "skills - Display technical skills.", "synopsis": "skills", "description": t('man_skills_description') },
     "experience": { "name": "experience - Display work experience.", "synopsis": "experience", "description": t('man_experience_description') },
     "education": { "name": "education - Display educational background.", "synopsis": "education", "description": t('man_education_description') },
-    "project-list": { "name": "project-list - Display links to projects.", "synopsis": "project-list", "description": t('man_project-list_description') },
-    "project": { "name": "project - Display information about a specific project.", "synopsis": "project <PROJECT_NAME>", "description": t('man_project_description') },
+    "project": { "name": "project - Display information about a specific project.", "synopsis": "project [-S <PROJECT_NAME>]", "description": t('man_project_description') },
     "contact": { "name": "contact - Display contact information.", "synopsis": "contact", "description": t('man_contact_description') },
     "social": { "name": "social - Display social media links.", "synopsis": "social", "description": t('man_social_description') },
     "echo": { "name": "echo - Display a line of text.", "synopsis": "echo [TEXT]", "description": t('man_echo_description') },
@@ -461,7 +455,7 @@ export function Terminal() {
     "stats": { "name": "stats - Display developer stats.", "synopsis": "stats", "description": t('man_stats_description') },
     "pwd": { "name": "pwd - Print name of current/working directory.", "synopsis": "pwd", "description": t('man_pwd_description') },
     "credits": { "name": "credits - Display project credits.", "synopsis": "credits", "description": t('man_credits_description') }
-  }), [lang]);
+  }), [t]);
   
   const getBlogPosts = useCallback((t: (key: keyof Translations, params?: any) => string) => ({
       "desarrollas-en-windows": {
@@ -474,50 +468,21 @@ export function Terminal() {
           "date": "2024-08-19",
           "content": t('blog_post_2_content')
       }
-  }), [lang]);
+  }), [t]);
 
 
-  // Función principal para procesar y ejecutar un comando.
-  const processCommand = useCallback(async (commandStr: string) => {
-    const [command, ...args] = commandStr.trim().split(/\s+/);
-    addLine(<Prompt input={commandStr} path={currentPath} user={remoteHost ? `${remoteHost}@voidshell` : 'glitchbane@voidshell'}/>);
+  const terminalInterface: Terminal = {
+    setPath: (path: string) => setCurrentPath(path),
+    getPath: () => currentPath,
+    addLine,
+    t,
+    setRemoteHost,
+    finishInteractiveCommand,
+    isMobile,
+    addFileToCurrentDir,
+  };
 
-    // Lógica para cuando se está en una "conexión remota".
-    if (remoteHost) {
-        if (command === 'exit') {
-            setRemoteHost(null);
-            addLine(t('connect_logout'));
-        } else if (command === 'ls') {
-            addLine(
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {remoteSystems[remoteHost].files.map(file => (
-                        <div key={file} className="flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-primary" />
-                            <span>{file}</span>
-                        </div>
-                    ))}
-                </div>
-            );
-        } else if (command) {
-            addLine(t('connect_command_not_found', { command }));
-        }
-    } else if (command === '') {
-        // No hace nada si el comando está vacío.
-    } else if (command in commands) {
-        // Ejecuta el comando si existe.
-        const output = commands[command](args, t, terminalInterface);
-        if (output) addLine(output);
-    } else {
-        addLine(t('command_not_found', { command }));
-    }
 
-    // Añade el comando al historial.
-    if (commandStr.trim() !== '') {
-        setCommandHistory(prev => [commandStr, ...prev].slice(0, 50));
-    }
-    setHistoryIndex(-1);
-  }, [t, currentPath, terminalInterface, addLine, remoteHost, fs]);
-  
   // --- DEFINICIÓN DE COMANDOS ---
   // Cada comando es una función que se añade al objeto `commands`.
   
@@ -579,62 +544,86 @@ export function Terminal() {
     }
     
     if (node.content) {
-        if (node.content.startsWith('project ')) {
-            const projectName = node.content.split(' ')[1];
-            return commands['project']([projectName], t, terminalInterface);
-        }
-        if (node.content.endsWith('_md')) {
-            return t_html(node.content as keyof Translations);
-        }
         if (node.content === 'cat_image') {
             return t('cat_image');
         }
+        const translation = t(node.content as keyof Translations, { filename });
+        if (translation === node.content) {
+             return <div className="text-red-500">{t('cat_no_such_file', { filename })}</div>;
+        }
+        if (node.content.endsWith('_md')) {
+            return <div dangerouslySetInnerHTML={{ __html: translation }} />
+        }
+        return <pre className="whitespace-pre-wrap">{translation}</pre>;
     }
     return <pre className="whitespace-pre-wrap">{t(node.content as keyof Translations, {filename})}</pre>;
   };
-  commands['about'] = (args, t) => t_html('about_md');
-  commands['resume'] = (args, t) => t_html('resume_md');
-  commands['skills'] = (args, t) => t_html('skills_md');
-  commands['experience'] = (args, t) => t_html('experience_md');
-  commands['education'] = (args, t) => t_html('education_md');
-  commands['project-list'] = (args, t) => t_html('project-list_md');
-  commands['credits'] = (args, t) => t_html('credits_md');
+  commands['about'] = (args, t) => commands['cat'](['Documents/about.md'], t, terminalInterface);
+  commands['resume'] = (args, t) => commands['cat'](['resume.md'], t, terminalInterface);
+  commands['skills'] = (args, t) => commands['cat'](['Documents/skills.md'], t, terminalInterface);
+  commands['experience'] = (args, t) => commands['cat'](['Documents/experience.md'], t, terminalInterface);
+  commands['education'] = (args, t) => commands['cat'](['Documents/education.md'], t, terminalInterface);
+  commands['credits'] = (args, t) => commands['cat'](['credits.md'], t, terminalInterface);
+  
   commands['project'] = (args, t) => {
-    const projectName = args[0]?.toLowerCase();
-    if (!projectName) {
-      return (
-        <div>
-          <p>{t('project_usage')}</p>
-          <p>{t('project_available', { projects: Object.keys(projectData).join(', ') })}</p>
-        </div>
-      );
+    if (args.length === 0) {
+        return (
+            <div>
+                <p>{t('project_list_info_2')}</p>
+                <ul className="list-disc list-inside">
+                    {Object.keys(projectData).map(p => <li key={p}>{p}</li>)}
+                </ul>
+                <br />
+                <p>{t('project_list_usage')}</p>
+            </div>
+        );
     }
-    const project = projectData[projectName];
-    if (project) {
-      return (
-        <div>
-          <p><span className="font-bold text-primary">{project.name}</span></p>
-          <p>{project.description}</p>
-          <p><span className="font-bold">{t('project_tech')}:</span> {project.tech.join(', ')}</p>
-          <p>
-            <span className="font-bold">GitHub: </span>
-            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              {project.githubUrl}
-            </a>
-          </p>
-          <p>
-            <span className="font-bold">Demo: </span>
-            <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-              {project.demoUrl}
-            </a>
-          </p>
-        </div>
-      );
+    
+    if (args.length === 2 && args[0].toLowerCase() === '-s') {
+        const projectName = args[1]?.toLowerCase();
+        const project = projectData[projectName];
+
+        if (project) {
+            return (
+                <div>
+                    <p><span className="font-bold text-primary">{project.name}</span></p>
+                    <p>{project.description}</p>
+                    <p><span className="font-bold">{t('project_tech')}:</span> {project.tech.join(', ')}</p>
+                    <p>
+                        <span className="font-bold">GitHub: </span>
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            {project.githubUrl}
+                        </a>
+                    </p>
+                    <p>
+                        <span className="font-bold">Demo: </span>
+                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            {project.demoUrl}
+                        </a>
+                    </p>
+                </div>
+            );
+        }
+        return t('project_not_found', { projectName });
     }
-    return t('project_not_found', { projectName });
-  };
-  commands['contact'] = (args, t) => t_html('contact_md');
-  commands['social'] = (args, t) => t_html('social_md');
+    
+    return (
+        <div>
+            <p>{t('project_list_info_1')}</p>
+            <p><a href="https://github.com/isradev-git" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://github.com/isradev-git</a></p>
+            <br />
+            <p>{t('project_list_info_2')}</p>
+            <ul className="list-disc list-inside">
+                {Object.keys(projectData).map(p => <li key={p}>{p}</li>)}
+            </ul>
+            <br />
+            <p>{t('project_list_usage')}</p>
+        </div>
+    );
+};
+  
+  commands['contact'] = (args, t) => commands['cat'](['contact.md'], t, terminalInterface);
+  commands['social'] = (args, t) => commands['cat'](['social.md'], t, terminalInterface);
   commands['echo'] = (args) => args.join(' ');
   commands['history'] = (args, t) => (
     <div className="flex flex-col">
@@ -681,7 +670,8 @@ export function Terminal() {
     const blogPostsData = getBlogPosts(t);
 
     if (!subCommand) {
-      return t_html('blog_usage');
+      const content = t('blog_usage');
+      return <div dangerouslySetInnerHTML={{ __html: content }} />;
     }
 
     if (subCommand === 'ls') {
@@ -826,13 +816,14 @@ export function Terminal() {
     }
     if (remoteSystems[host]) {
         setRemoteHost(host);
-        return t_html(remoteSystems[host].welcome as keyof Translations);
+        const welcomeMessage = t(remoteSystems[host].welcome as keyof Translations);
+        return <div dangerouslySetInnerHTML={{ __html: welcomeMessage }} />
     }
     return t('connect_not_found', { host });
   };
   
   // Función que maneja la lógica de `htop` y `top`.
-  const handleHtop = (t: (key: keyof Translations, params?: any) => string, { addLine, finishInteractiveCommand, isMobile }: Omit<Terminal, 'addFileToCurrentDir'>) => {
+  const handleHtop = (t: (key: keyof Translations, params?: any) => string, { addLine, finishInteractiveCommand, isMobile }: Omit<Terminal, 'addFileToCurrentDir' | 'getPath' | 'setPath' | 'setRemoteHost' | 'addFileToCurrentDir' | 't'>) => {
     if (isMobile) {
         return t('htop_mobile_not_supported');
     }
@@ -875,7 +866,8 @@ export function Terminal() {
     if (args.length === 0) {
         return t('sudo_usage');
     }
-    return t_html('sudo_permission_denied');
+    const content = t('sudo_permission_denied');
+    return <div dangerouslySetInnerHTML={{ __html: content }} />;
   };
   
   commands['wget'] = (args, t, { addFileToCurrentDir }) => {
@@ -916,11 +908,51 @@ export function Terminal() {
     return getPath();
   };
 
+  // Función principal para procesar y ejecutar un comando.
+  const processCommand = useCallback(async (commandStr: string) => {
+    const [command, ...args] = commandStr.trim().split(/\s+/);
+    addLine(<Prompt input={commandStr} path={currentPath} user={remoteHost ? `${remoteHost}@voidshell` : 'glitchbane@voidshell'}/>);
+
+    // Lógica para cuando se está en una "conexión remota".
+    if (remoteHost) {
+        if (command === 'exit') {
+            setRemoteHost(null);
+            addLine(t('connect_logout'));
+        } else if (command === 'ls') {
+            addLine(
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {remoteSystems[remoteHost].files.map(file => (
+                        <div key={file} className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-primary" />
+                            <span>{file}</span>
+                        </div>
+                    ))}
+                </div>
+            );
+        } else if (command) {
+            addLine(t('connect_command_not_found', { command }));
+        }
+    } else if (command === '') {
+        // No hace nada si el comando está vacío.
+    } else if (command in commands) {
+        // Ejecuta el comando si existe.
+        const output = commands[command](args, t, terminalInterface);
+        if (output) addLine(output);
+    } else {
+        addLine(t('command_not_found', { command }));
+    }
+
+    // Añade el comando al historial.
+    if (commandStr.trim() !== '') {
+        setCommandHistory(prev => [commandStr, ...prev].slice(0, 50));
+    }
+    setHistoryIndex(-1);
+  }, [t, currentPath, remoteHost, addLine, terminalInterface]);
 
   // --- MANEJADORES DE EVENTOS ---
 
   // Maneja los eventos de teclado en el input.
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback(async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (isInteractive) return; // No hacer nada si un comando interactivo está activo.
 
     if (e.key === 'Enter') {
@@ -959,12 +991,12 @@ export function Terminal() {
       } else {
         // Lógica para mostrar múltiples candidatos si hay varias coincidencias.
         e.preventDefault();
-        const [command, ...args] = input.trim().split(/\s+/);
+        const [command] = input.trim().split(/\s+/);
         
         let candidates: string[] = [];
         const allCommands = Object.keys(commands);
 
-        if (args.length === 0 && !input.includes(' ')) {
+        if (!input.includes(' ')) {
            candidates = allCommands.filter(c => c.startsWith(command));
         }
 
@@ -976,7 +1008,7 @@ export function Terminal() {
         }
       }
     }
-  };
+  }, [isInteractive, isProcessing, input, processCommand, historyIndex, commandHistory, suggestion, currentPath, addLine]);
 
   // Maneja los cambios en el input para actualizar el estado y las sugerencias.
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1052,7 +1084,7 @@ export function Terminal() {
     addLine(<NeofetchOutput data={neofetchData} />); // Muestra el neofetch.
     setIsProcessing(false);
     
-  }, [ip, t, userInfo, asciiArt, addLine, booted]);
+  }, [ip, t, userInfo, asciiArt, addLine, booted, updateLastLine]);
 
   // Ejecuta la secuencia de arranque una vez que se ha obtenido la IP.
   useEffect(() => {
@@ -1062,15 +1094,15 @@ export function Terminal() {
   }, [ip, booted, runBootSequence]);
   
   // Enfoca el input cuando el usuario hace clic en cualquier parte de la terminal.
-  const focusInput = () => {
+  const focusInput = useCallback(() => {
     if (!isInteractive) {
       inputRef.current?.focus();
     }
-  };
+  }, [isInteractive]);
 
   useEffect(() => {
     focusInput();
-  }, [isProcessing, isInteractive]);
+  }, [isProcessing, isInteractive, focusInput]);
 
   // --- RENDERIZADO DEL COMPONENTE ---
   return (
