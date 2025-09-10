@@ -355,27 +355,24 @@ export function Terminal() {
 
   // Arte ASCII para `neofetch`.
   const asciiArt = `
-                   -
-                  .o+
-                 .ooo/
-                .oooo:
-               .oooooo:
-               -+oooooo+:
-             ./:--+oooo+:
-            /++++/+++++++:
-           /++++++++++++++:
-          /+++ooooooooooooo/
-         ./ooosssso++osssssso+
-        .oossssso-    ./ossssss+
-       -osssssso.      :ssssssso.
-      :osssssss/        ossssooo/
-     /ossssssss/        +ssssooo/-
-   '/ossssssss+      -o+osooosso+
-   '+sso+:-'             '.-/+oso
-  '+ss/                       '++o/
-  /so'                       '++s/
-  .                         '    .
-  '                          '
+                  ##
+                 ####
+                ######
+               ########
+              ##########
+             ############
+            ##############
+           ################
+          ##################
+         ####################
+        ######################
+       #########      #########
+      ##########      ##########
+     ###########      ###########
+    ##########          ##########
+   #######                  #######
+  ####                          ####
+ ###                              ###
 `;
 
   // --- EFECTOS ---
