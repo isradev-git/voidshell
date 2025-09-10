@@ -817,7 +817,12 @@ export function Terminal() {
   commands['connect'] = (args, t, { setRemoteHost }) => {
     const host = args[0];
     if (!host) {
-        return t('connect_usage');
+        return (
+            <>
+                <p>{t('connect_usage')}</p>
+                <p>{t('connect_available_hosts', { hosts: Object.keys(remoteSystems).join(', ') })}</p>
+            </>
+        );
     }
     if (remoteSystems[host]) {
         setRemoteHost(host);
